@@ -194,7 +194,7 @@ SUBSYSTEM_DEF(vote)
 						continue
 					if(GLOB.clients.len < VM.config_min_users)
 						continue
-					if(GLOB.clients.len > VM.config_max_users)
+					if(GLOB.clients.len > VM.config_max_users || VM.config_max_users == 0)
 						continue
 					choices.Add(VM.map_name)
 			if("custom")
