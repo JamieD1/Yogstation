@@ -3,6 +3,12 @@
 	icon_state = "plating"
 	initial_gas_mix = AIRLESS_ATMOS
 
+/turf/open/floor/plating/airless/ceiling
+	icon_state = "ceiling"
+
+/turf/open/floor/plating/airless/ceiling/glass
+	icon_state = "ceiling_glass"
+
 /turf/open/floor/plating/abductor
 	name = "alien floor"
 	icon_state = "alienpod1"
