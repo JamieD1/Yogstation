@@ -34,6 +34,7 @@
 	var/custom_price
 	var/custom_premium_price
 	///Whether spessmen with an ID with an age below AGE_MINOR (21 by default) can buy this item
+	var/age_restricted = FALSE
 
 	var/datum/component/orbiter/orbiters
 
@@ -41,7 +42,7 @@
 	var/rad_insulation = RAD_NO_INSULATION
 
 	var/chat_color_name // Last name used to calculate a color for the chatmessage overlays
-	
+
 	var/chat_color // Last color calculated for the the chatmessage overlays
 
 	var/chat_color_darkened // A luminescence-shifted value of the last color calculated for chatmessage overlays
