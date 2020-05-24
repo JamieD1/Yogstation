@@ -33,6 +33,7 @@
 
 	var/custom_price
 	var/custom_premium_price
+	///Whether spessmen with an ID with an age below AGE_MINOR (21 by default) can buy this item
 
 	var/datum/component/orbiter/orbiters
 

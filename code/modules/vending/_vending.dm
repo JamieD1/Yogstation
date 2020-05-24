@@ -23,6 +23,8 @@ IF YOU MODIFY THE PRODUCTS LIST OF A MACHINE, MAKE SURE TO UPDATE ITS RESUPPLY C
 	var/max_amount = 0
 	var/custom_price
 	var/custom_premium_price
+	///Whether spessmen with an ID with an age below AGE_MINOR (21 by default) can buy this item
+	var/age_restricted = FALSE
 
 /obj/machinery/vending
 	name = "\improper Vendomat"
@@ -73,6 +75,8 @@ IF YOU MODIFY THE PRODUCTS LIST OF A MACHINE, MAKE SURE TO UPDATE ITS RESUPPLY C
 	var/chef_price = 10
 	var/default_price = 25
 	var/extra_price = 50
+	///Whether our age check is currently functional
+	var/age_restrictions = TRUE
 	var/onstation = TRUE //if it doesn't originate from off-station during mapload, everything is free
 	var/list/canload_access_list
 
@@ -80,6 +84,9 @@ IF YOU MODIFY THE PRODUCTS LIST OF A MACHINE, MAKE SURE TO UPDATE ITS RESUPPLY C
 	var/input_display_header = "Custom Compartment"
 
 	var/obj/item/vending_refill/refill_canister = null		//The type of refill canisters used by this machine.
+
+	/// used for narcing on underages
+	var/obj/item/radio/Radio
 
 /obj/item/circuitboard
 	var/onstation = TRUE //if the circuit board originated from a vendor off station or not.
@@ -110,6 +117,8 @@ IF YOU MODIFY THE PRODUCTS LIST OF A MACHINE, MAKE SURE TO UPDATE ITS RESUPPLY C
 				circuit.onstation = onstation //sync up the circuit so the pricing schema is carried over if it's reconstructed.
 	else if(circuit && (circuit.onstation != onstation)) //check if they're not the same to minimize the amount of edited values.
 		onstation = circuit.onstation //if it was constructed outside mapload, sync the vendor up with the circuit's var so you can't bypass price requirements by moving / reconstructing it off station.
+	Radio = new /obj/item/radio(src)
+	Radio.listening = 0
 
 /obj/machinery/vending/Destroy()
 	QDEL_NULL(wires)
@@ -187,6 +196,11 @@ GLOBAL_LIST_EMPTY(vending_products)
 		R.max_amount = amount
 		R.custom_price = initial(temp.custom_price)
 		R.custom_premium_price = initial(temp.custom_premium_price)
+		if (istype(temp, /obj/item))
+			var/obj/item/O = temp
+			R.age_restricted = initial(O.age_restricted)
+		else
+			R.age_restricted = FALSE
 		recordlist += R
 
 /obj/machinery/vending/proc/restock(obj/item/vending_refill/canister)
@@ -355,7 +369,8 @@ GLOBAL_LIST_EMPTY(vending_products)
 	var/datum/bank_account/account
 	var/mob/living/carbon/human/H
 	var/obj/item/card/id/C
-	//yogs start -- ignores_capitalism stuff
+	//yogs start -- ignores_capitalism stuff\
+	var/list/display_records
 	var/mob/living/L
 	if(isliving(user))
 		L = user
@@ -386,7 +401,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 	if(!product_records.len)
 		dat += "<font color = 'red'>No product loaded!</font>"
 	else
-		var/list/display_records = product_records + coin_records
+		display_records = products_records + coin_records
 		if(extended_inventory)
 			display_records = product_records + coin_records + hidden_records
 		dat += "<table>"
@@ -424,7 +439,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 		return
 
 	usr.set_machine(src)
-
+	
 	if((href_list["dispense"]) && (vend_ready))
 		var/N = href_list["dispense"]
 		if(vending_machine_input[N] <= 0) // Sanity check, there are probably ways to press the button when it shouldn't be possible.
@@ -444,6 +459,24 @@ GLOBAL_LIST_EMPTY(vending_products)
 				flick(icon_deny,src)
 				vend_ready = 1
 				return
+			else if(age_restrictions && (!C.registered_age || C.registered_age < AGE_MINOR))
+				var/product_is_age_restricted = FALSE
+				var/datum/data/vending_product/R
+					for (R in display_records)
+						if (R.name == N && R.age_restricted)
+						product_is_age_restricted = TRUE
+						break
+						
+				if (product_is_age_restricted)
+					say("You are not of legal age to purchase [R.name].")
+					if(!(usr in GLOB.narcd_underages))
+						Radio.set_frequency(FREQ_SECURITY)
+						Radio.talk_into(src, "SECURITY ALERT: Underaged crewmember [H] recorded attempting to purchase [R.name] in [get_area(src)]. Please watch for substance abuse.", FREQ_SECURITY)
+						GLOB.narcd_underages += H
+					flick(icon_deny,src)
+					vend_ready = TRUE
+					return
+
 			var/datum/bank_account/account = C.registered_account
 			if(!account.adjust_money(-chef_price))
 				say("You do not possess the funds to purchase this meal.")
