@@ -12,7 +12,7 @@
 /// The maximum size of a stack object.
 #define MAX_STACK_SIZE 50
 /// Maximum amount of cable in a coil
-#define MAXCOIL 30
+#define MAXCOIL 40
 
 //Category of materials
 /// Is the material from an ore? currently unused but exists atm for categorizations sake
@@ -39,17 +39,6 @@
 #define MATCONTAINER_ANY_INTENT (1<<2)
 ///If the user won't receive a warning when attacking the container with an unallowed item.
 #define MATCONTAINER_SILENT (1<<3)
-
-/// Whether a material's mechanical effects should apply to the atom. This is necessary for other flags to work.
-#define MATERIAL_EFFECTS (1<<0)
-/// Applies the material color to the atom's color. Deprecated, use MATERIAL_GREYSCALE instead
-#define MATERIAL_COLOR (1<<1)
-/// Whether a prefix describing the material should be added to the name
-#define MATERIAL_ADD_PREFIX (1<<2)
-/// Whether a material should affect the stats of the atom
-#define MATERIAL_AFFECT_STATISTICS (1<<3)
-/// Applies the material greyscale color to the atom's greyscale color.
-#define MATERIAL_GREYSCALE (1<<4)
 
 //Special return values of [/datum/component/material_container/insert_item]
 /// No material was found inside them item

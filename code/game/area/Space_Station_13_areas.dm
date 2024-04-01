@@ -22,9 +22,9 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 	icon_state = "space"
 	requires_power = TRUE
 	always_unpowered = TRUE
-	static_lighting = FALSE
+	static_lighting = TRUE
 
-	base_lighting_alpha = 255
+	base_lighting_alpha = 0
 	base_lighting_color = COLOR_STARLIGHT
 	power_light = FALSE
 	power_equip = FALSE
@@ -40,9 +40,6 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 
 /area/space/nearstation
 	icon_state = "space_near"
-	static_lighting = TRUE
-	base_lighting_alpha = 0
-	base_lighting_color = null
 
 /area/start
 	name = "start area"
@@ -488,6 +485,14 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 	airlock_wires = /datum/wires/airlock/service
 	sound_environment = SOUND_AREA_WOODFLOOR
 
+/area/crew_quarters/public_lounge
+	name = "Lounge"
+	icon_state = "bar"
+	minimap_color = "#5ac866"
+	mood_bonus = 5
+	mood_message = span_nicegreen("I love being in the lounge!\n")
+	airlock_wires = /datum/wires/airlock/service
+
 /area/crew_quarters/bar/Initialize(mapload)
 	. = ..()
 	GLOB.bar_areas += src
@@ -518,7 +523,6 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 /area/crew_quarters/theatre/abandoned
 	name = "Abandoned Theatre"
 	icon_state = "Theatre"
-	lights_always_start_on = FALSE
 
 /area/library
 	name = "Library"

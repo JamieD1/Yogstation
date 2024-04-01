@@ -308,6 +308,21 @@ SUBSYSTEM_DEF(job)
 		return TRUE
 	return FALSE
 
+/datum/controller/subsystem/job/proc/FillNetminPosition()
+	var/datum/job/job = GetJob("Network Admin")
+	if(!job)
+		return
+	for(var/i = job.total_positions, i > 0, i--)
+		if(job.current_positions >= job.total_positions) //If we assign a netmin before this proc is run, (malf rework?)
+			return TRUE
+		for(var/level in level_order)
+			var/list/candidates = list()
+			candidates = FindOccupationCandidates(job, level)
+			if(candidates.len)
+				var/mob/dead/new_player/candidate = pick(candidates)
+				if(AssignRole(candidate, "Network Admin"))
+					break
+
 /// Rolls a number of security based on the roundstart population
 /datum/controller/subsystem/job/proc/FillSecurityPositions()
 	var/coeff = CONFIG_GET(number/min_security_scaling_coeff)
@@ -392,7 +407,8 @@ SUBSYSTEM_DEF(job)
 
 	//Check for an AI
 	JobDebug("DO, Running AI Check")
-	FillAIPosition()
+	if(FillAIPosition())
+		FillNetminPosition()
 	JobDebug("DO, AI Check end")
 
 	//Check for Security
@@ -617,9 +633,9 @@ SUBSYSTEM_DEF(job)
 /datum/controller/subsystem/job/proc/irish_override()
 	var/datum/map_template/template = SSmapping.station_room_templates["Bar Irish"]
 
-	for(var/obj/effect/landmark/stationroom/box/bar/B in GLOB.bar_landmarks)
+	for(var/obj/effect/landmark/stationroom/box/bar/B in GLOB.landmarks_list)
 		template.load(B.loc, centered = FALSE)
-
+		qdel(B)
 
 /datum/controller/subsystem/job/proc/random_chapel_init()
 	try
@@ -664,9 +680,9 @@ SUBSYSTEM_DEF(job)
 			log_game("WARNING: CHAPEL RECOVERY FAILED! THERE WILL BE NO CHAPEL FOR THIS ROUND!")
 			return
 
-		for(var/obj/effect/landmark/stationroom/box/chapel/B in GLOB.chapel_landmarks)
+		for(var/obj/effect/landmark/stationroom/box/chapel/B in GLOB.landmarks_list)
 			template.load(B.loc, centered = FALSE)
-
+			qdel(B)
 	catch(var/exception/e)
 		message_admins("RUNTIME IN RANDOM_CHAPEL_INIT")
 		spawn_chapel()
@@ -681,9 +697,9 @@ SUBSYSTEM_DEF(job)
 	if(isnull(template))
 		message_admins("UNABLE TO SPAWN CHAPEL")
 
-	for(var/obj/effect/landmark/stationroom/box/chapel/B in GLOB.chapel_landmarks)
+	for(var/obj/effect/landmark/stationroom/box/chapel/B in GLOB.landmarks_list)
 		template.load(B.loc, centered = FALSE)
-
+		qdel(B)
 
 /datum/controller/subsystem/job/proc/random_clerk_init()
 	try
@@ -728,9 +744,9 @@ SUBSYSTEM_DEF(job)
 			log_game("WARNING: CLERK RECOVERY FAILED! THERE WILL BE NO CLERK SHOP FOR THIS ROUND!")
 			return
 
-		for(var/obj/effect/landmark/stationroom/box/clerk/B in GLOB.clerk_office_landmarks)
+		for(var/obj/effect/landmark/stationroom/box/clerk/B in GLOB.landmarks_list)
 			template.load(B.loc, centered = FALSE)
-
+			qdel(B)
 	catch(var/exception/e)
 		message_admins("RUNTIME IN RANDOM_CLERK_INIT")
 		spawn_clerk()
@@ -745,8 +761,9 @@ SUBSYSTEM_DEF(job)
 	if(isnull(template))
 		message_admins("UNABLE TO SPAWN CLERK")
 	
-	for(var/obj/effect/landmark/stationroom/box/clerk/B in GLOB.clerk_office_landmarks)
+	for(var/obj/effect/landmark/stationroom/box/clerk/B in GLOB.landmarks_list)
 		template.load(B.loc, centered = FALSE)
+		qdel(B)
 
 /datum/controller/subsystem/job/proc/handle_auto_deadmin_roles(client/C, rank)
 	if(!C?.holder)

@@ -27,6 +27,8 @@ By design, d1 is the smallest direction and d2 is the highest
 	desc = "A flexible, superconducting insulated cable for heavy-duty power transfer."
 	icon = 'icons/obj/power_cond/cables.dmi'
 	icon_state = "0-1"
+	///Yogs, Biome wanted cables above pipes
+	//plane = FLOOR_PLANE
 	layer = WIRE_LAYER //Above hidden pipes, GAS_PIPE_HIDDEN_LAYER
 	anchored = TRUE
 	obj_flags = CAN_BE_HIT | ON_BLUEPRINTS
@@ -89,7 +91,11 @@ By design, d1 is the smallest direction and d2 is the highest
 	cable_color = param_color || cable_color || pick(cable_colors)
 	if(cable_colors[cable_color])
 		cable_color = cable_colors[cable_color]
+	return INITIALIZE_HINT_LATELOAD
+
+/obj/structure/cable/LateInitialize()
 	update_appearance(UPDATE_ICON)
+	//is_fully_initialized = TRUE
 
 /obj/structure/cable/Destroy()					// called when a cable is deleted
 	if(powernet)
@@ -605,7 +611,7 @@ By design, d1 is the smallest direction and d2 is the highest
 		return
 
 	if(!isturf(T) || T.underfloor_accessibility < UNDERFLOOR_INTERACTABLE || !T.can_have_cabling())
-		to_chat(user, span_warning("You can only lay cables on catwalks and plating!"))
+		to_chat(user, span_warning("You can only lay cables on top of exterior catwalks and plating!"))
 		return
 
 	if(get_amount() < 1) // Out of cable
@@ -624,6 +630,7 @@ By design, d1 is the smallest direction and d2 is the highest
 			dirn = get_dir(T, user)
 	else
 		dirn = dirnew
+
 
 	for(var/obj/structure/cable/LC in T)
 		if(LC.d2 == dirn && LC.d1 == 0)
@@ -667,7 +674,7 @@ By design, d1 is the smallest direction and d2 is the highest
 	var/turf/T = C.loc
 
 	if(!isturf(T) || T.underfloor_accessibility < UNDERFLOOR_INTERACTABLE || !T.can_have_cabling())
-		to_chat(user, span_warning("You can only lay cables on catwalks and plating!"))
+		to_chat(user, span_warning("You can only lay cables on top of exterior catwalks and plating!"))
 		return
 	
 	if(get_amount() < 1) // Out of cable
