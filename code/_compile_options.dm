@@ -60,8 +60,8 @@
 #define DEMO_WRITER (world.system_type == MS_WINDOWS ? "demo-writer.dll" : "libdemo-writer.so")
 
 //If you update these values, update the message in the #error
-#define MAX_BYOND_MAJOR 514
-#define MAX_BYOND_MINOR 1589
+#define MAX_BYOND_MAJOR 516
+#define MAX_BYOND_MINOR 1690
 
 // You can define IGNORE_MAX_BYOND_VERSION to bypass the max version check.
 // Note: This will likely break the game, especially any extools/auxtools linkage. Only use if you know what you're doing!
