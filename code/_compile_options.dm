@@ -66,7 +66,7 @@
 // You can define IGNORE_MAX_BYOND_VERSION to bypass the max version check.
 // Note: This will likely break the game, especially any extools/auxtools linkage. Only use if you know what you're doing!
 #ifdef OPENDREAM // Thanks, Altoids!
-#define IGNORE_MAX_BYOND_VERSION
+#define IGNORE_MAX_BYOND_VERSION 1
 #endif
 
 #if ((DM_VERSION > MAX_BYOND_MAJOR) || (DM_BUILD > MAX_BYOND_MINOR)) && !defined(IGNORE_MAX_BYOND_VERSION)
